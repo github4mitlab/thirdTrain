@@ -22,10 +22,22 @@ router.get('/:productId', (req, res) => {
 });
 
 
-// post router
+
+//post router
+// router.post('/', (req, res) => {
+//     res.status(200).json({
+//         msg: "post / products.js"
+//     });
+// });
+
 router.post('/', (req, res) => {
+    const product = {
+        name : req.body.name,
+        price : req.body.price
+    };
     res.status(200).json({
-        msg: "post / orders.js"
+        msg: "POST / products.js",
+        createdProduct: product
     });
 });
 
