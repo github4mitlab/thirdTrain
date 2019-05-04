@@ -106,6 +106,26 @@ router.post("/", (req, res) => {
     });
 });
 
+// DB Delete
+router.delete('/:productId', (req, res) => {
+    const id = req.params.productId;
+    productModel
+        .remove({ _id: id})
+        .exec()
+        .then( result => {
+            res.status(200).json({
+                success : "Delete Success!!!",
+                id: id
+            });
+        })
+        .catch( err => {
+            console.log(err);
+            res.status(500).json({
+                delete_err: err
+            });
+        });
+});
+
 // put router
 router.put("/", (req, res) => {
   res.status(200).json({
@@ -113,11 +133,11 @@ router.put("/", (req, res) => {
   });
 });
 
-// delete router
-router.delete("/", (req, res) => {
-  res.status(200).json({
-    msg: "delete / order.js"
-  });
-});
+// // delete router
+// router.delete("/", (req, res) => {
+//   res.status(200).json({
+//     msg: "delete / order.js"
+//   });
+// });
 
 module.exports = router;
