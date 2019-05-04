@@ -1,28 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
 const productModel = require("../models/products");
 
+
+//  GET products Info through DB
 router.get("/", (req, res) => {
-  res.status(200).json({
-    message: "GET Product"
-  });
+  productModel
+    .find()
+    .exec()
+    .then(docs => {
+      console.log(docs);
+      res.status(200).json({
+        products: docs
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        err: err
+      });
+    });
 });
 
-router.get("/:productId", (req, res) => {
-  const id = req.params.productId;
-  if (id === "special") {
-    res.status(200).json({
-      id_check_msg: "마즘",
-      id: id
-    });
-  } else {
-    res.status(200).json({
-      id_check_msg: "틀림"
-    });
-  }
-});
+// router.get("/:productId", (req, res) => {
+//   const id = req.params.productId;
+//   if (id === "special") {
+//     res.status(200).json({
+//       id_check_msg: "마즘",
+//       id: id
+//     });
+//   } else {
+//     res.status(200).json({
+//       id_check_msg: "틀림"
+//     });
+//   }
+// });
 
 //post router
 // router.post('/', (req, res) => {
@@ -58,11 +71,11 @@ router.post("/", (req, res) => {
         createdProudct: result
       });
     })
-    .catch( err => {
-        console.log(err);
-        res.status(500).json({
-            error: err
-        });
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
     });
 });
 
