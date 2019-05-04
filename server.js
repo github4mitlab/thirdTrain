@@ -2,6 +2,8 @@ const http = require('http');
 const express = require('express');
 const bodyparser = require('body-parser');
 const app = express();
+const mongoose = require('mongoose');
+
 
 //에러핸들링
 const morgan = require('morgan');
@@ -15,6 +17,12 @@ app.use(morgan('dev'));
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended:false}));
 
+// DB 연결부
+const db = require('./config/key').mongoURI;
+
+mongoose.connect(db, { useNewUrlParser: true })
+    .then( () => console.log("MongoDB Connected..."))
+    .catch( err => console.log(err));
 
 // // body-parser 정의
 app.use((req, res, next) => {
@@ -33,6 +41,10 @@ app.use((req, res, next) => {
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+
+app.get('/', function(req, res) {
+    res.send("Root");
+});
 
 //에러 핸들러 구현
 app.use((req, res, next) => {
