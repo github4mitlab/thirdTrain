@@ -34,20 +34,30 @@ router.get('/', (req, res) => {
         });
 });
 
+// 상세 주문 정보 조회
 router.get('/:orderId', (req, res) => {
-    const id = req.params.orderId;
-    if (id !== '1234') {
+   const id = req.params.orderId;
+   orderModel.findById(id)
+    .exec()
+    .then( order => {
+        if(!order){
+            return res.status(400).json({
+                ord_err: "Order Num Not Found"
+            });
+        }
         res.status(200).json({
-            orders_message: "잘못된 아이디"
+            order: order,
+            request: {
+                type: 'GET',
+                url: "http://localhost:3000/orders"
+            }
         });
-    } else {
-        res.status(200).json({
-            orders_message: "정확한 아이디",
-            id : id
-        });
-
-    }
-
+    })
+    .catch( err => {
+        res.status(500).json({
+            ord_err: err
+        })
+    });
 });
 
 
@@ -138,10 +148,24 @@ router.put('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
-    res.status(200).json({
-        message: "DELETE / orders.js"
-    });
+router.delete('/:orderId', (req, res) => {
+    orderModel.remove({ _id: req.params.orderId })
+        .exec()
+        .then( result => {
+            res.status(200).json({
+                ord_msg: "Order Info Deleted!!",
+                request: {
+                    type: 'POST',
+                    url: 'http://localhost:3000/orders',
+                    body: { productId: "ID", quantity: "Number"}
+                }
+            });
+        })
+        .catch( err => {
+            res.status(500).json({
+                ord_err: err
+            });
+        });
 });
 
 module.exports = router;
