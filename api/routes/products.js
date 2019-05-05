@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const productModel = require("../models/products");
+const Product = require("../models/products");
 
 
 //  GET products Info through DB
 router.get("/", (req, res) => {
-  productModel
+  Product
     .find()
     .exec()
     .then(docs => {
@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
 // Request Products Info through Detailed Query
 router.get('/:productId', (req, res) => {
     const id = req.params.productId;
-    productModel.findById(id)
+    Product.findById(id)
         .exec()
         .then( doc => {
             console.log("Quering DB", doc);
@@ -84,7 +84,7 @@ router.get('/:productId', (req, res) => {
 
 //DB Update through POST Router
 router.post("/", (req, res) => {
-  const product = new productModel({
+  const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price
@@ -109,7 +109,7 @@ router.post("/", (req, res) => {
 // DB Delete
 router.delete('/:productId', (req, res) => {
     const id = req.params.productId;
-    productModel
+    Product
         .remove({ _id: id})
         .exec()
         .then( result => {
@@ -126,12 +126,42 @@ router.delete('/:productId', (req, res) => {
         });
 });
 
-// put router
-router.put("/", (req, res) => {
-  res.status(200).json({
-    msg: "put / orders.js"
-  });
+
+// DB Patch
+router.patch('/:productId', (req, res) => {
+    const id = req.params.productId;
+    const updateOps = {};
+    for(const ops of req.body) {
+        console.log(ops,id);
+        updateOps[ops.propName] = ops.value;
+    }
+
+    Product
+        .update(
+            {_id: id},
+            {$set: updateOps}
+        )
+        .exec()
+        .then( result => {
+            res.status(200).json({
+                productInfo: result
+            });
+        })
+        .catch( err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+        console.log(updateOps);
 });
+
+// // put router
+// router.put("/", (req, res) => {
+//   res.status(200).json({
+//     msg: "put / orders.js"
+//   });
+// });
 
 // // delete router
 // router.delete("/", (req, res) => {
