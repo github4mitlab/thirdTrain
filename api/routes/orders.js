@@ -5,11 +5,33 @@ const mongoose = require('mongoose');
 const orderModel = require('../models/order');
 const productModel = require('../models/products');
 
-
+// order에 대한 전체 데이터 불러와서 뿌려주기
 router.get('/', (req, res) => {
-    res.status(200).json({
-        orders_message: "GET / Orders"
-    });
+    orderModel.find()
+        .select("product quantity _id")
+        .exec()
+        .then( docs => {
+            res.status(200).json({
+                count: docs.length,
+                order: docs.map( doc => {
+                    return{
+                        _id: doc._id,
+                        product: doc.product,
+                        quantity: doc.quantity,
+                        request: {
+                            type: 'GET',
+                            url: "http://localhost:3000/orders/" + doc._id
+                        }
+                    }
+                })
+
+            });
+        })
+        .catch( err => {
+            res.status(500).json({
+                ord_msg: err
+            });
+        });
 });
 
 router.get('/:orderId', (req, res) => {
