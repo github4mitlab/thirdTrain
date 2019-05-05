@@ -19,6 +19,7 @@ app.use(bodyparser.urlencoded({ extended:false}));
 
 // DB 연결부
 const db = require('./config/key').mongoURI;
+mongoose.Promise = global.Promise;  //비동기 방식 에 대한 내부 명령어
 
 mongoose.connect(db, { useNewUrlParser: true })
     .then( () => console.log("MongoDB Connected..."))

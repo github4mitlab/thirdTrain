@@ -10,10 +10,25 @@ router.get("/", (req, res) => {
     .find()
     .exec()
     .then(docs => {
-      console.log(docs);
-      res.status(200).json({
-        products: docs
-      });
+      // console.log(docs);
+      // res.status(200).json({
+      //   products: docs
+      // });
+      const response = {
+        count: docs.length,
+        products: docs.map( doc => {
+          return{
+            name: doc.name,
+            price: doc.price,
+            _id: doc._id,
+            request:{
+              type: "GET",
+              url: "http://localhost:3000/products/" + doc._id
+            }
+          };
+        })
+      };
+      res.status(200).json(response);
     })
     .catch(err => {
       console.log(err);
@@ -33,7 +48,11 @@ router.get('/:productId', (req, res) => {
             console.log("Quering DB", doc);
             if (doc) {
                 res.status(200).json({
-                    productInfo: doc
+                  product: doc,
+                  request:{
+                    type: 'GET',
+                    url: "http://localhost:3000/products"
+                  }
                 });
             } else {
                 res.status(400).json({
@@ -95,7 +114,15 @@ router.post("/", (req, res) => {
       console.log(result);
       res.status(200).json({
         msg: "POST DB OK",
-        createdProudct: result
+        createdProudct: {
+          name: result.name,
+          price: result.price,
+          _id: result._id,
+          request: {
+            type: 'GET',
+            url: "http://localhost:3000/products/" + result._id
+          }
+        }
       });
     })
     .catch(err => {
@@ -114,8 +141,12 @@ router.delete('/:productId', (req, res) => {
         .exec()
         .then( result => {
             res.status(200).json({
-                success : "Delete Success!!!",
-                id: id
+              message: 'Product deleted',
+              request: {
+                type: 'POST',
+                url: "http://localhost:3000/products",
+                body: { name: 'String', price: 'String'}
+              }
             });
         })
         .catch( err => {
@@ -144,7 +175,11 @@ router.patch('/:productId', (req, res) => {
         .exec()
         .then( result => {
             res.status(200).json({
-                productInfo: result
+                message: 'Product updated',
+                request:{
+                  type: 'GET',
+                  url: "http://localhost:3000/products/" + id
+                }
             });
         })
         .catch( err => {
