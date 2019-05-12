@@ -51,8 +51,26 @@ router.post("/signup", (req, res) => {
       }
     })
     .catch
-    // 추후 직접 구현
-    ();
+    (
+         // 추후 직접 구현
+    );
+});
+
+// 사용자 계정 삭제 
+router.delete('/:userId', (req, res) => {
+    userModel.remove({ _id : req.params.userId})
+        .exec()
+        .then( result => {
+            res.status(200).json({
+                usr_msg: "사용자 삭제되었음"
+            });
+        })
+        .catch( err => {
+            console.log(err);
+            res.status(500).json({
+                usr_err: "삭제중에 오류 발생"
+            });
+        });
 });
 
 module.exports = router;
