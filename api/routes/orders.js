@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
+
 
 const orderModel = require('../models/order');
 const productModel = require('../models/products');
 
 // order에 대한 전체 데이터 불러와서 뿌려주기
-router.get('/', (req, res) => {
+router.get('/', checkAuth, (req, res) => {
     orderModel.find()
         .select("product quantity _id")
         .exec()
@@ -35,7 +37,7 @@ router.get('/', (req, res) => {
 });
 
 // 상세 주문 정보 조회
-router.get('/:orderId', (req, res) => {
+router.get('/:orderId', checkAuth, (req, res) => {
    const id = req.params.orderId;
    orderModel.findById(id)
     .exec()
@@ -65,7 +67,7 @@ router.get('/:orderId', (req, res) => {
 // root: /orders/
 
 
-router.post('/', (req, res) => {
+router.post('/', checkAuth, (req, res) => {
     productModel.findById(req.body.productId)
     .then(product => {
         if (!product) {
@@ -142,13 +144,13 @@ router.post('/', (req, res) => {
     //     });
 });
 
-router.put('/', (req, res) => {
+router.put('/', checkAuth, (req, res) => {
     res.status(200).json({
         message: "PUT / orders.js"
     });
 });
 
-router.delete('/:orderId', (req, res) => {
+router.delete('/:orderId', checkAuth,  (req, res) => {
     orderModel.remove({ _id: req.params.orderId })
         .exec()
         .then( result => {
